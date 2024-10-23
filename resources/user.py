@@ -4,10 +4,9 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import get_jwt, jwt_required
 from passlib.hash import pbkdf2_sha256
-from models import UserModel
-from schemas import UserSchema
+from models import UserModel, ExpiredTokenModel
+from schemas import UserSchema, ExpiredTokenSchema
 from db import db
-from blocklist import BLOCKLIST
 
 from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
@@ -44,7 +43,9 @@ class UserLogout(MethodView):
     @blp.arguments(UserSchema)
     def post(self, user_data):
         jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
+        token = ExpiredTokenModel(token=jti)
+        db.session.add(token)
+        db.session.commit()
         return {"message": "Sucessfully logout."}
 
 @blp.route("/refresh")

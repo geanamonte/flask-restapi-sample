@@ -7,7 +7,7 @@ from resources.item import blp as ItemBlueprint
 from resources.store import blp as StoreBlueprint
 from resources.tag import blp as TagBlueprint
 from resources.user import blp as UserBlueprint
-from blocklist import BLOCKLIST
+from models import ExpiredTokenModel
 from db import db
 
 
@@ -34,7 +34,8 @@ def create_app(db_url=None):
 
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blocklist(jwt_header, jwt_payload):
-        return jwt_payload["jti"] in BLOCKLIST
+        token = ExpiredTokenModel.query.filter(ExpiredTokenModel.token == jwt_payload["jti"]).first()
+        return True if token else False
     
     @jwt.revoked_token_loader
     def revoked_token_callback(jwt_header, jwt_payload):
