@@ -2,6 +2,8 @@ version: '3'
 services:
   api:
     build: .
+    environment:
+      - DATABASE_URL=postgresql://postgres:admin@database:5432/db
     ports:
       - "8000:8000"
     volumes:
@@ -9,3 +11,19 @@ services:
         source: .
         target: /app
     working_dir: /app
+    depends_on:
+      - database
+    env_file:
+      - ./.env
+  database:
+    image: postgres
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:

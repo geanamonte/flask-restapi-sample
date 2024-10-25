@@ -1,5 +1,5 @@
 import os
-
+from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
@@ -15,7 +15,7 @@ from db import db
 
 def create_app(db_url=None):
     app = Flask(__name__)
-
+    load_dotenv()
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
@@ -78,3 +78,5 @@ def create_app(db_url=None):
     api.register_blueprint(UserBlueprint)
 
     return app
+
+app = create_app()
